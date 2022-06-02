@@ -1,0 +1,4 @@
+# ENV variables
+*.env
+*.vscode
+*.txt
