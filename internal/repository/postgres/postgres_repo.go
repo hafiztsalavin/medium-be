@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"news-be/config"
+	"news-be/internal/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

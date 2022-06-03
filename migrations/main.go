@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"news-be/config"
-	"news-be/repository/entity"
-	"news-be/repository/postgres"
+	"news-be/internal/config"
+	"news-be/internal/repository/entity"
+	"news-be/internal/repository/postgres"
 
 	"gorm.io/gorm"
 )

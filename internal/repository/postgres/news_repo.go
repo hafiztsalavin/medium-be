@@ -1,10 +1,13 @@
 package postgres
 
 import (
+	"news-be/internal/entity"
+
 	"gorm.io/gorm"
 )
 
 type NewsInterface interface {
+	ReadOne() ([]entity.News, error)
 }
 
 type newsRepository struct {
