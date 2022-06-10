@@ -67,7 +67,6 @@ func (tr *tagRepository) saveTag(newTag entity.Tag) error {
 	}
 
 	return nil
-
 }
 
 func (tr *tagRepository) deleteTag(tag entity.Tag) error {
@@ -78,7 +77,6 @@ func (tr *tagRepository) deleteTag(tag entity.Tag) error {
 	}
 
 	return nil
-
 }
 
 func (tr *tagRepository) tagGetByUsername(tagName string) (entity.Tag, error) {
