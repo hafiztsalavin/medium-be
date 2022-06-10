@@ -6,7 +6,8 @@ import (
 
 // result as an auth token
 type Claims struct {
-	Id    uint32
+	Id    uint
 	Email string
+	Role  string
 	jwt.StandardClaims
 }

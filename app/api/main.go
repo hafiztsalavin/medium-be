@@ -2,41 +2,45 @@ package main
 
 import (
 	"fmt"
-	"news-be/internal/config"
-	"news-be/internal/middlewares"
-	"news-be/internal/routes"
+	"medium-be/internal/config"
+	"medium-be/internal/repository"
+	"medium-be/internal/routes"
 
-	"github.com/labstack/echo"
+	pc "medium-be/internal/controller/posts"
+	pr "medium-be/internal/repository/posts"
+
+	tc "medium-be/internal/controller/tags"
+	tr "medium-be/internal/repository/tags"
+
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
 
-	// Initialize news config
+	// Setup Configuration
 	cfg := config.NewConfig()
 
-	// Initialize DB repositories
-	// db, err := postgres.NewPostgresRepo(&cfg.DatabaseConfig)
-	// checkErr(err)
+	// Setup Postgres
+	db, err := repository.NewPostgresRepo(&cfg.DatabaseConfig)
+	checkErr(err)
 
 	e := echo.New()
+	// Setup Repository
+	newsRepo := pr.NewPostRepository(db)
+	newsController := pc.NewPostController(newsRepo)
 
-	// repository
-	// tagRepo := postgres.NewTagRepository(db)
-	// newsRepo := postgres.NewNewsRepository(db)
+	tagRepo := tr.NewTagRepository(db)
+	tagController := tc.NewTagsController(tagRepo)
 
-	// controller
-	// nc := news.NewNewsController(newsRepo)
-
-	userGroup := e.Group("/auth")
-	middlewares.CheckJWT(userGroup)
-	routes.UserPath(userGroup)
+	routes.NewsPath(e, newsController)
+	routes.TagPath(e, tagController)
 
 	address := fmt.Sprintf(":%d", cfg.Port)
 	e.Logger.Fatal(e.Start(address))
 }
 
-// func checkErr(e error) {
-// 	if e != nil {
-// 		panic(e)
-// 	}
-// }
+func checkErr(e error) {
+	if e != nil {
+		panic(e)
+	}
+}

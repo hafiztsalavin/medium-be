@@ -1,11 +1,8 @@
-package postgres
+package tags
 
 import (
 	"gorm.io/gorm"
 )
-
-type TagInterface interface {
-}
 
 type tagRepository struct {
 	db *gorm.DB

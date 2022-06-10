@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"news-be/internal/config"
+	"medium-be/internal/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

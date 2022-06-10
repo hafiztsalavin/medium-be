@@ -1,6 +1,9 @@
 package config
 
 import (
+	"medium-be/internal/constants"
+	"os"
+
 	"github.com/joeshaw/envdecode"
 	"github.com/subosito/gotenv"
 )
@@ -26,6 +29,9 @@ func NewConfig() *Config {
 	if err := envdecode.Decode(&cfg); err != nil {
 		panic(err)
 	}
+
+	constants.JWT_ACCESS_KEY = os.Getenv("JWT_ACCESS_KEY")
+	constants.JWT_REFRESH_KEY = os.Getenv("JWT_REFRESH_KEY")
 
 	return &cfg
 }

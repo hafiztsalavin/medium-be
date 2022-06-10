@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"news-be/internal/config"
-	"news-be/internal/repository/entity"
-	"news-be/internal/repository/postgres"
+	"medium-be/internal/config"
+	"medium-be/internal/entity"
+	"medium-be/internal/repository"
 
 	"gorm.io/gorm"
 )
@@ -14,7 +14,7 @@ import (
 // drop tables
 func DropTables(db *gorm.DB) error {
 
-	if err := db.Migrator().DropTable(&entity.News{}, &entity.Tag{}, &entity.NewsTags{}); err != nil {
+	if err := db.Migrator().DropTable(&entity.Posts{}, &entity.Tag{}, &entity.PostTags{}); err != nil {
 		return err
 	}
 
@@ -26,7 +26,7 @@ func DropTables(db *gorm.DB) error {
 func main() {
 	cfg := config.NewConfig()
 
-	db, err := postgres.NewPostgresRepo(&cfg.DatabaseConfig)
+	db, err := repository.NewPostgresRepo(&cfg.DatabaseConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func MigrateModels(db *gorm.DB) error {
 		return err
 	}
 
-	if err := db.AutoMigrate(&entity.Tag{}, &entity.News{}); err != nil {
+	if err := db.AutoMigrate(&entity.Tag{}, &entity.Posts{}); err != nil {
 		log.Fatal(err)
 		return err
 	}

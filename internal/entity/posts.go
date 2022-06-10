@@ -6,26 +6,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type News struct {
+type Posts struct {
 	gorm.Model
+	UserID uint
 	Title  string
 	Body   string
 	Status string `gorm:"default:draft"`
-	Tags   []Tag  `gorm:"many2many:news_tags;"`
+	Tags   []Tag  `gorm:"many2many:post_tags;"`
 }
 
-type NewsFilter struct {
+type PostsFilter struct {
 	Status string
 	Tags   []string
 }
 
-type NewsTags struct {
-	NewsID uint `gorm:"primaryKey"`
+type PostTags struct {
+	PostID uint `gorm:"primaryKey"`
 	TagID  uint `gorm:"primaryKey"`
 }
 
-func (NewsTags) BeforeCreate(db *gorm.DB) error {
-	err := db.SetupJoinTable(&News{}, "Tags", &NewsTags{})
+func (PostTags) BeforeCreate(db *gorm.DB) error {
+	err := db.SetupJoinTable(&Posts{}, "Tags", &PostTags{})
 
 	if err != nil {
 		return errors.New(err.Error())
