@@ -5,6 +5,7 @@ import (
 	"medium-be/internal/config"
 	"medium-be/internal/repository"
 	"medium-be/internal/routes"
+	"medium-be/internal/utils"
 
 	pc "medium-be/internal/controller/posts"
 	pr "medium-be/internal/repository/posts"
@@ -12,6 +13,7 @@ import (
 	tc "medium-be/internal/controller/tags"
 	tr "medium-be/internal/repository/tags"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,6 +27,8 @@ func main() {
 	checkErr(err)
 
 	e := echo.New()
+
+	e.Validator = &utils.Validator{Validator: validator.New()}
 	// Setup Repository
 	newsRepo := pr.NewPostRepository(db)
 	newsController := pc.NewPostController(newsRepo)

@@ -82,3 +82,10 @@ func NewUnauthorizeResponse() DefaultResponse {
 		"Unauthorize",
 	}
 }
+
+func ErrorHandler(code int, message string) DefaultResponse {
+	return DefaultResponse{
+		code,
+		message,
+	}
+}
