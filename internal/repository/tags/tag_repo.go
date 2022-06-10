@@ -50,6 +50,15 @@ func (tr *tagRepository) DeleteTag(tagId int) error {
 	return nil
 }
 
+func (tr *tagRepository) GetTagId(tagId int) (entity.Tag, error) {
+	existedTag, err := tr.tagGetById(tagId)
+	if err != nil {
+		return existedTag, err
+	}
+
+	return existedTag, nil
+}
+
 func (tr *tagRepository) saveTag(newTag entity.Tag) error {
 	err := tr.db.Save(&newTag).Error
 

@@ -49,3 +49,22 @@ func (tc *TagController) Delete(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
+
+func (tc *TagController) Read(c echo.Context) error {
+	id, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil || id <= 0 {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
+	}
+
+	existedTag, err := tc.Repository.GetTagId(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
+	}
+
+	response := TagResponse{
+		ID:  existedTag.ID,
+		Tag: existedTag.Name,
+	}
+
+	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
+}
