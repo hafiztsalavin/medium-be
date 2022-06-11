@@ -40,8 +40,8 @@ func (tr *tagRepository) DeleteTag(tagId int) error {
 	existedTag, err := tr.tagGetById(tagId)
 	if err != nil {
 		return err
-
 	}
+
 	err = tr.deleteTag(existedTag)
 	if err != nil {
 		return err
@@ -57,6 +57,27 @@ func (tr *tagRepository) GetTagId(tagId int) (entity.Tag, error) {
 	}
 
 	return existedTag, nil
+}
+
+func (tr *tagRepository) GetAllTag() ([]entity.Tag, error) {
+	var tags []entity.Tag
+
+	tr.db.Find(&tags)
+
+	return tags, nil
+}
+
+func (tr *tagRepository) EditTag(tagId int, newTag entity.Tag) error {
+	existedTag, err := tr.tagGetById(tagId)
+	if err != nil {
+		return err
+	}
+
+	if err := tr.db.Model(&existedTag).Updates(newTag).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (tr *tagRepository) saveTag(newTag entity.Tag) error {
