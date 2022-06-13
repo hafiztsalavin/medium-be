@@ -44,6 +44,43 @@ func (pr *postRepository) CreatePost(newPost entity.Posts, tags []int) error {
 	return nil
 }
 
+func (pr *postRepository) EditPost(idPost int, editPost entity.Posts, tags []int) error {
+	existedPost, _ := pr.postGetByTitle(editPost.Title)
+	if existedPost.Title != "" && existedPost.ID != uint(idPost) {
+		return errors.New("you can't use this title, because title already used in another article")
+	}
+
+	var post entity.Posts
+	if err := pr.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.First(&post, idPost).Error; err != nil {
+			return err
+		}
+
+		if err := pr.db.Model(&post).Updates(editPost).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&entity.PostTags{}, "posts_id = ?", idPost).Error; err != nil {
+			return err
+		}
+
+		for _, tag := range tags {
+			if err := tx.Create(&entity.PostTags{
+				PostsID: uint(idPost),
+				TagID:   uint(tag),
+			}).Error; err != nil {
+				return errors.New("one of tags not exist")
+			}
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (pr *postRepository) postGetByTitle(titlePost string) (entity.Posts, error) {
 	rec := entity.Posts{}
 

@@ -95,8 +95,8 @@ func (tc *TagController) UpdateTag(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
-	var tagRequest TagRequest
 
+	var tagRequest TagRequest
 	c.Bind(&tagRequest)
 	if err := c.Validate(&tagRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
