@@ -42,12 +42,27 @@ func MigrateModels(db *gorm.DB) error {
 		return err
 	}
 
-	if err := db.AutoMigrate(&entity.Tag{}, &entity.Posts{}); err != nil {
+	if err := db.AutoMigrate(&entity.Posts{}); err != nil {
 		log.Fatal(err)
 		return err
 	}
+
+	// if err := db.SetupJoinTable(&entity.Posts{}, "Tags", &entity.PostTags{}); err != nil {
+	// 	println(err.Error())
+	// 	panic("Failed to setup join table")
+	// }
 
 	fmt.Println("Model(s) migrated")
 
 	return nil
 }
+
+// func (PostTags) BeforeCreate(db *gorm.DB) error {
+// 	err := db.SetupJoinTable(&Posts{}, "Tags", &PostTags{})
+
+// 	if err != nil {
+// 		return errors.New(err.Error())
+// 	}
+
+// 	return nil
+// }

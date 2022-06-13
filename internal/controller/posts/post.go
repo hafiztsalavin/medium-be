@@ -1,6 +1,8 @@
 package posts
 
 import (
+	"fmt"
+	"medium-be/internal/entity"
 	"medium-be/internal/repository/posts"
 	"medium-be/internal/utils"
 	"net/http"
@@ -17,9 +19,30 @@ func NewPostController(postInterface posts.PostInterface) *PostController {
 	return &PostController{Repository: postInterface}
 }
 
-// func (pc PostController) CreatePost(c echo.Context) error {
+func (pc PostController) CreatePost(c echo.Context) error {
+	idUser := c.Get("id").(uint)
 
-// }
+	var postRequest PostRequest
+
+	c.Bind(&postRequest)
+	if err := c.Validate(&postRequest); err != nil {
+		fmt.Println("disini")
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
+	}
+
+	newPost := entity.Posts{
+		UserID: idUser,
+		Title:  postRequest.Title,
+		Body:   postRequest.Body,
+	}
+
+	err := pc.Repository.CreatePost(newPost, postRequest.Tags)
+	if err != nil {
+		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
+}
 
 func (pc PostController) UserDetails(c echo.Context) error {
 	idUser := c.Get("id").(uint)

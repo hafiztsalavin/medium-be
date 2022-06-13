@@ -11,7 +11,7 @@ import (
 
 func TagPath(e *echo.Echo, tagsController *tags.TagController) {
 	tag := e.Group("/tags", middleware.JWT([]byte(constants.JWT_ACCESS_KEY)), middlewares.AdminRole)
-	tag.POST("", tagsController.CreateTag)
+	tag.POST("/newtag", tagsController.CreateTag)
 	tag.POST("/delete", tagsController.DeleteTag) // params id
 
 	tag.GET("/list", tagsController.ReadAllTag)

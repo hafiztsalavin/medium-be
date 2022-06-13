@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"medium-be/internal/auth"
 	"medium-be/internal/utils"
 	"net/http"
@@ -17,7 +16,6 @@ func UserRole(next echo.HandlerFunc) echo.HandlerFunc {
 		if user.Role != "user" {
 			return c.JSON(http.StatusUnauthorized, utils.NewUnauthorizeResponse())
 		}
-		fmt.Println(user.Id, user.Email, user.Role)
 
 		c.Set("id", user.Id)
 		c.Set("email", user.Email)

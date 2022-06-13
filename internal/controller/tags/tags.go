@@ -33,7 +33,7 @@ func (tc *TagController) CreateTag(c echo.Context) error {
 
 	err := tc.Repository.CreateTag(tag)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, utils.ErrorResponse(406, "Tag already exist"))
+		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())

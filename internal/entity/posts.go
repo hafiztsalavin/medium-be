@@ -21,8 +21,8 @@ type PostsFilter struct {
 }
 
 type PostTags struct {
-	PostID uint `gorm:"primaryKey"`
-	TagID  uint `gorm:"primaryKey"`
+	PostsID uint `gorm:"primaryKey"`
+	TagID   uint `gorm:"primaryKey"`
 }
 
 func (PostTags) BeforeCreate(db *gorm.DB) error {

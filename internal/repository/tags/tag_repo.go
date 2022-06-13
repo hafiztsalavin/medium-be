@@ -3,7 +3,6 @@ package tags
 import (
 	"errors"
 	"medium-be/internal/entity"
-	"strings"
 
 	"gorm.io/gorm"
 )
@@ -17,18 +16,12 @@ func NewTagRepository(db *gorm.DB) *tagRepository {
 }
 
 func (tr *tagRepository) CreateTag(newTag entity.Tag) error {
-	existedTag, err := tr.tagGetByUsername(newTag.Name)
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		if !strings.Contains(err.Error(), "not found") {
-			return err
-		}
-	}
-
+	existedTag, _ := tr.tagGetByTag(newTag.Name)
 	if existedTag != (entity.Tag{}) {
 		return errors.New("duplicate data")
 	}
 
-	err = tr.saveTag(newTag)
+	err := tr.saveTag(newTag)
 	if err != nil {
 		return err
 	}
@@ -100,10 +93,10 @@ func (tr *tagRepository) deleteTag(tag entity.Tag) error {
 	return nil
 }
 
-func (tr *tagRepository) tagGetByUsername(tagName string) (entity.Tag, error) {
+func (tr *tagRepository) tagGetByTag(tagName string) (entity.Tag, error) {
 	rec := entity.Tag{}
 
-	err := tr.db.Where("id = ?", tagName).First(&rec).Error
+	err := tr.db.Where("name = ?", tagName).First(&rec).Error
 	if err != nil {
 		return entity.Tag{}, err
 	}
