@@ -16,8 +16,8 @@ type Posts struct {
 }
 
 type PostsFilter struct {
-	Status string
-	Tags   []string
+	PageNum  int
+	PageSize int
 }
 
 type PostTags struct {

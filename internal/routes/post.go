@@ -11,6 +11,8 @@ import (
 
 func NewsPath(e *echo.Echo, postController *posts.PostController) {
 	// e.GET("/auth/me", news.ReadOne, middleware.CheckAccess)
+	e.GET("/posts", postController.AllPostPublish)
+
 	post := e.Group("/post", middleware.JWT([]byte(constants.JWT_ACCESS_KEY)), middlewares.UserRole)
 	post.POST("", postController.CreatePost)
 

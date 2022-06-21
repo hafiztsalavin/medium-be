@@ -1,6 +1,7 @@
 package posts
 
 import (
+	"fmt"
 	"medium-be/internal/entity"
 	"medium-be/internal/repository/posts"
 	"medium-be/internal/utils"
@@ -121,6 +122,7 @@ func (pc PostController) ReadAllPost(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
+	fmt.Println(postDB)
 
 	response := []PostResponse{}
 	for _, post := range postDB {
@@ -139,6 +141,7 @@ func (pc PostController) ReadAllPost(c echo.Context) error {
 			})
 		}
 	}
+
 	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }
 
@@ -170,4 +173,46 @@ func (pc PostController) DeletePost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
+}
+
+func (pc PostController) AllPostPublish(c echo.Context) error {
+
+	pageNum, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pagesize"))
+	postFilter := entity.PostsFilter{
+		PageNum:  pageNum,
+		PageSize: pageSize,
+	}
+
+	postDB, err := pc.Repository.AllPostPublish(postFilter)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
+	}
+
+	for _, post := range postDB {
+		tags := []string{}
+		for _, tag := range post.Tags {
+			tags = append(tags, tag.Name)
+		}
+	}
+
+	response := []PostResponse{}
+	for _, post := range postDB {
+		if len(post.Tags) > 0 {
+
+			tags := []string{}
+			for _, tag := range post.Tags {
+				tags = append(tags, tag.Name)
+			}
+			response = append(response, PostResponse{
+				ID:     int(post.ID),
+				Title:  post.Title,
+				Body:   post.Body,
+				Status: post.Status,
+				Tags:   tags,
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }

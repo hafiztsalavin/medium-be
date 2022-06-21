@@ -9,4 +9,6 @@ type PostInterface interface {
 	ReadAllPost(idPost int, statusPost string) ([]entity.Posts, error)
 	PublishPost(idPost, idUser int) error
 	DeletePost(idPost, idUser int) error
+
+	AllPostPublish(filter entity.PostsFilter) ([]entity.Posts, error)
 }

@@ -141,6 +141,17 @@ func (pr *postRepository) DeletePost(idPost, idUser int) error {
 	return nil
 }
 
+func (pr *postRepository) AllPostPublish(filter entity.PostsFilter) ([]entity.Posts, error) {
+	var post []entity.Posts
+	offset := filter.PageSize * (filter.PageNum - 1)
+
+	if err := pr.db.Preload("Tags").Offset(offset).Limit(filter.PageSize).Find(&post).Error; err != nil {
+		return post, err
+	}
+
+	return post, nil
+}
+
 func (pr *postRepository) postGetByTitle(titlePost string) (entity.Posts, error) {
 	rec := entity.Posts{}
 
