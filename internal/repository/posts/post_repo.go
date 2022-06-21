@@ -81,6 +81,16 @@ func (pr *postRepository) EditPost(idPost int, editPost entity.Posts, tags []int
 	return nil
 }
 
+func (pr *postRepository) ReadPost(id int) (entity.Posts, error) {
+	var post entity.Posts
+
+	if err := pr.db.Preload("Tags").First(&post, id).Error; err != nil {
+		return post, err
+	}
+
+	return post, nil
+}
+
 func (pr *postRepository) postGetByTitle(titlePost string) (entity.Posts, error) {
 	rec := entity.Posts{}
 

@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+
+  medium-postgres:
+    image: postgres:13-alpine
+    container_name: medium-postgres
+    ports:
+      - 5400:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    restart: always

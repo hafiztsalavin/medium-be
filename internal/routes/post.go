@@ -14,4 +14,5 @@ func NewsPath(e *echo.Echo, postController *posts.PostController) {
 	post := e.Group("/post", middleware.JWT([]byte(constants.JWT_ACCESS_KEY)), middlewares.UserRole)
 	post.POST("", postController.CreatePost)
 	post.PUT("/update/:id", postController.UpdatePost)
+	post.GET("/:id", postController.ReadPost)
 }

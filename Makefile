@@ -3,3 +3,6 @@ start:
 
 migrate:
 	go run migrations/main.go
+
+seed:
+	go run seeders/main.go

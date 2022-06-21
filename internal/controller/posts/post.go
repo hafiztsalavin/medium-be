@@ -83,3 +83,32 @@ func (pc PostController) UserDetails(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }
+
+func (pc PostController) ReadPost(c echo.Context) error {
+	idPost, err := strconv.Atoi(c.Param("id"))
+	idUser := c.Get("id").(uint)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
+	}
+
+	postDB, err := pc.Repository.ReadPost(idPost)
+	if err != nil || postDB.UserID != idUser {
+		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
+	}
+
+	tags := []string{}
+	for _, tag := range postDB.Tags {
+		tags = append(tags, tag.Name)
+	}
+
+	response := PostResponse{}
+	response = PostResponse{
+		ID:     int(postDB.ID),
+		Title:  postDB.Title,
+		Body:   postDB.Body,
+		Status: postDB.Status,
+		Tags:   tags,
+	}
+	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
+}

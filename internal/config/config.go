@@ -15,11 +15,11 @@ type Config struct {
 }
 
 type DatabaseOption struct {
-	Username string `env:"DATABASE_USERNAME,required"`
-	Password string `env:"DATABASE_PASSWORD,required"`
-	Host     string `env:"DATABASE_HOST,default=localhost"`
-	Port     string `env:"DATABASE_PORT,default=5432"`
-	Name     string `env:"DATABASE_NAME,required"`
+	Username string `env:"DB_USER,required"`
+	Password string `env:"DB_PASSWORD,required"`
+	Host     string `env:"DB_HOST,default=localhost"`
+	Port     string `env:"DB_PORT,default=5432"`
+	Name     string `env:"DB_NAME,required"`
 }
 
 func NewConfig() *Config {
