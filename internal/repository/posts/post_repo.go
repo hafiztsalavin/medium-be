@@ -2,6 +2,7 @@ package posts
 
 import (
 	"errors"
+	"fmt"
 	"medium-be/internal/entity"
 
 	"gorm.io/gorm"
@@ -89,6 +90,55 @@ func (pr *postRepository) ReadPost(id int) (entity.Posts, error) {
 	}
 
 	return post, nil
+}
+
+func (pr *postRepository) ReadAllPost(idUser int, statusPost string) ([]entity.Posts, error) {
+	var post []entity.Posts
+
+	if statusPost != "" {
+		if err := pr.db.Preload("Tags").Where("user_id = ? AND status = ?", idUser, statusPost).Find(&post).Error; err != nil {
+			return post, err
+		}
+	} else {
+		if err := pr.db.Preload("Tags").Where("user_id = ?", idUser).Find(&post).Error; err != nil {
+			return post, err
+		}
+	}
+
+	return post, nil
+}
+
+func (pr *postRepository) PublishPost(idPost, idUser int) error {
+	var post entity.Posts
+
+	if err := pr.db.Where("id = ? AND user_id = ?", idPost, idUser).First(&post).Error; err != nil {
+		fmt.Println("disini")
+
+		return err
+	}
+
+	if err := pr.db.Model(&post).Update("status", "publish").Error; err != nil {
+		return err
+
+	}
+	return nil
+}
+
+func (pr *postRepository) DeletePost(idPost, idUser int) error {
+	var post entity.Posts
+
+	if err := pr.db.Where("id = ? AND user_id = ?", idPost, idUser).First(&post).Error; err != nil {
+		fmt.Println("disini")
+
+		return err
+	}
+
+	if err := pr.db.Model(&post).Update("status", "deleted").Error; err != nil {
+		return err
+	}
+
+	pr.db.Delete(&post)
+	return nil
 }
 
 func (pr *postRepository) postGetByTitle(titlePost string) (entity.Posts, error) {

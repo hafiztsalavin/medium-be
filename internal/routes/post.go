@@ -13,6 +13,11 @@ func NewsPath(e *echo.Echo, postController *posts.PostController) {
 	// e.GET("/auth/me", news.ReadOne, middleware.CheckAccess)
 	post := e.Group("/post", middleware.JWT([]byte(constants.JWT_ACCESS_KEY)), middlewares.UserRole)
 	post.POST("", postController.CreatePost)
-	post.PUT("/update/:id", postController.UpdatePost)
+
+	post.PUT("/:id", postController.UpdatePost)
+	post.PUT("/:id/publish", postController.PublishPost)
+	post.PUT("/:id/delete", postController.DeletePost)
+
 	post.GET("/:id", postController.ReadPost)
+	post.GET("/list", postController.ReadAllPost) // params status
 }

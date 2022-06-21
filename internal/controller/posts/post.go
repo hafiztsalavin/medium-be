@@ -112,3 +112,62 @@ func (pc PostController) ReadPost(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }
+
+func (pc PostController) ReadAllPost(c echo.Context) error {
+	idUser := c.Get("id").(uint)
+	statusPost := c.QueryParam("status")
+
+	postDB, err := pc.Repository.ReadAllPost(int(idUser), statusPost)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
+	}
+
+	response := []PostResponse{}
+	for _, post := range postDB {
+		if len(post.Tags) > 0 {
+
+			tags := []string{}
+			for _, tag := range post.Tags {
+				tags = append(tags, tag.Name)
+			}
+			response = append(response, PostResponse{
+				ID:     int(post.ID),
+				Title:  post.Title,
+				Body:   post.Body,
+				Status: post.Status,
+				Tags:   tags,
+			})
+		}
+	}
+	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
+}
+
+func (pc PostController) PublishPost(c echo.Context) error {
+	idUser := c.Get("id").(uint)
+	idPost, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
+	}
+
+	err = pc.Repository.PublishPost(idPost, int(idUser))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
+	}
+
+	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
+}
+
+func (pc PostController) DeletePost(c echo.Context) error {
+	idUser := c.Get("id").(uint)
+	idPost, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
+	}
+
+	err = pc.Repository.DeletePost(idPost, int(idUser))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
+	}
+
+	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
+}
