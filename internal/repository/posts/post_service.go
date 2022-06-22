@@ -11,4 +11,5 @@ type PostInterface interface {
 	DeletePost(idPost, idUser int) error
 
 	AllPostPublish(filter entity.PostsFilter) ([]entity.Posts, error)
+	ReadPostByUserId(idUser int) ([]entity.Posts, error)
 }

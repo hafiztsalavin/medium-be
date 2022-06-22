@@ -2,7 +2,6 @@ package posts
 
 import (
 	"errors"
-	"fmt"
 	"medium-be/internal/entity"
 
 	"gorm.io/gorm"
@@ -15,6 +14,8 @@ type postRepository struct {
 func NewPostRepository(db *gorm.DB) *postRepository {
 	return &postRepository{db: db}
 }
+
+const statusPublish = "publish"
 
 func (pr *postRepository) CreatePost(newPost entity.Posts, tags []int) error {
 	existedPost, _ := pr.postGetByTitle(newPost.Title)
@@ -112,7 +113,6 @@ func (pr *postRepository) PublishPost(idPost, idUser int) error {
 	var post entity.Posts
 
 	if err := pr.db.Where("id = ? AND user_id = ?", idPost, idUser).First(&post).Error; err != nil {
-		fmt.Println("disini")
 
 		return err
 	}
@@ -128,7 +128,6 @@ func (pr *postRepository) DeletePost(idPost, idUser int) error {
 	var post entity.Posts
 
 	if err := pr.db.Where("id = ? AND user_id = ?", idPost, idUser).First(&post).Error; err != nil {
-		fmt.Println("disini")
 
 		return err
 	}
@@ -143,9 +142,25 @@ func (pr *postRepository) DeletePost(idPost, idUser int) error {
 
 func (pr *postRepository) AllPostPublish(filter entity.PostsFilter) ([]entity.Posts, error) {
 	var post []entity.Posts
+
 	offset := filter.PageSize * (filter.PageNum - 1)
 
-	if err := pr.db.Preload("Tags").Offset(offset).Limit(filter.PageSize).Find(&post).Error; err != nil {
+	if filter.UserID != 0 && filter.Tags[0] != "" {
+		pr.db.Preload("Tags", "name IN (?)", filter.Tags).Where("status = ? AND user_id = ? ", statusPublish, filter.UserID).Offset(offset).Limit(filter.PageSize).Find(&post)
+	} else if filter.Tags[0] != "" {
+		pr.db.Preload("Tags", "name IN (?)", filter.Tags).Where("status = ?", statusPublish).Offset(offset).Limit(filter.PageSize).Find(&post)
+	} else if filter.UserID != 0 {
+		pr.db.Preload("Tags").Where("status = ? AND user_id = ? ", statusPublish, filter.UserID).Offset(offset).Limit(filter.PageSize).Find(&post)
+	} else {
+		pr.db.Preload("Tags").Where("status = ?", statusPublish).Offset(offset).Limit(filter.PageSize).Find(&post)
+	}
+	return post, nil
+}
+
+func (pr *postRepository) ReadPostByUserId(idUser int) ([]entity.Posts, error) {
+	var post []entity.Posts
+
+	if err := pr.db.Preload("Tags").Where("user_id = ? AND status = ?", idUser, statusPublish).Find(&post).Error; err != nil {
 		return post, err
 	}
 

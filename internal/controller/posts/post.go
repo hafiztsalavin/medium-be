@@ -1,12 +1,12 @@
 package posts
 
 import (
-	"fmt"
 	"medium-be/internal/entity"
 	"medium-be/internal/repository/posts"
 	"medium-be/internal/utils"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -122,11 +122,10 @@ func (pc PostController) ReadAllPost(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
-	fmt.Println(postDB)
 
 	response := []PostResponse{}
 	for _, post := range postDB {
-		if len(post.Tags) > 0 {
+		if len(post.Tags) >= 0 {
 
 			tags := []string{}
 			for _, tag := range post.Tags {
@@ -179,9 +178,13 @@ func (pc PostController) AllPostPublish(c echo.Context) error {
 
 	pageNum, _ := strconv.Atoi(c.QueryParam("page"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pagesize"))
+	userID, _ := strconv.Atoi(c.QueryParam("userid"))
+	tags := c.QueryParam("tags")
 	postFilter := entity.PostsFilter{
 		PageNum:  pageNum,
 		PageSize: pageSize,
+		UserID:   userID,
+		Tags:     strings.Split(tags, ","),
 	}
 
 	postDB, err := pc.Repository.AllPostPublish(postFilter)
@@ -189,16 +192,43 @@ func (pc PostController) AllPostPublish(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
 
+	response := []PostResponse{}
 	for _, post := range postDB {
-		tags := []string{}
-		for _, tag := range post.Tags {
-			tags = append(tags, tag.Name)
+		if len(post.Tags) > 0 {
+
+			tags := []string{}
+			for _, tag := range post.Tags {
+				tags = append(tags, tag.Name)
+			}
+			response = append(response, PostResponse{
+				ID:     int(post.ID),
+				Title:  post.Title,
+				Body:   post.Body,
+				Status: post.Status,
+				Tags:   tags,
+			})
 		}
+	}
+
+	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
+}
+
+func (pc PostController) PostByIDPost(c echo.Context) error {
+
+	idPost, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
+	}
+
+	postDB, err := pc.Repository.ReadPostByUserId(idPost)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
 
 	response := []PostResponse{}
 	for _, post := range postDB {
-		if len(post.Tags) > 0 {
+		if len(post.Tags) >= 0 {
 
 			tags := []string{}
 			for _, tag := range post.Tags {
