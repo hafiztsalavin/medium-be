@@ -5,7 +5,7 @@ API to manage Article and Tag to provide basic features of Article (like medium)
 
 ## Model
 This for schema db.
-![model-db](https://github.com/hafiztsalavin/medium-be/blob/main/docs/images/schema-medium-article-tags.png)
+![model-db](https://github.com/hafiztsalavin/medium-be/blob/master/docs/images/schema-medium-article-tags.png)
 
 ## Todo
 
