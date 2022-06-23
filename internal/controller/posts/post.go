@@ -221,27 +221,23 @@ func (pc PostController) PostByIDPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	postDB, err := pc.Repository.ReadPostByUserId(idPost)
+	postDB, err := pc.Repository.ReadPostByPostId(idPost)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
 
-	response := []PostResponse{}
-	for _, post := range postDB {
-		if len(post.Tags) >= 0 {
+	tags := []string{}
+	for _, tag := range postDB.Tags {
+		tags = append(tags, tag.Name)
+	}
 
-			tags := []string{}
-			for _, tag := range post.Tags {
-				tags = append(tags, tag.Name)
-			}
-			response = append(response, PostResponse{
-				ID:     int(post.ID),
-				Title:  post.Title,
-				Body:   post.Body,
-				Status: post.Status,
-				Tags:   tags,
-			})
-		}
+	response := PostResponse{}
+	response = PostResponse{
+		ID:     int(postDB.ID),
+		Title:  postDB.Title,
+		Body:   postDB.Body,
+		Status: postDB.Status,
+		Tags:   tags,
 	}
 
 	return c.JSON(http.StatusOK, utils.SuccessResponse(response))

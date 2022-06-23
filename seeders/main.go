@@ -65,20 +65,23 @@ func PostSeed(db *gorm.DB) error {
 	}
 
 	status := []string{"draft", "publish"}
-	for _, post := range posts {
+	size := len(posts)
+
+	for i := 0; i < size; i++ {
 		entryPost := entity.Posts{
-			UserID: post.UserID,
-			Title:  post.Title,
-			Body:   post.Body,
+			UserID: posts[i].UserID,
+			Title:  posts[i].Title,
+			Body:   posts[i].Body,
 			Status: status[rand.Intn(2-0)],
 		}
+
 		postTagEntry := entity.PostTags{
-			PostsID: uint(rand.Intn(10-1) + 1),
+			PostsID: uint(i + 1),
 			TagID:   uint(rand.Intn(6-1) + 1),
 		}
-
 		db.Create(&entryPost)
 		db.Create(&postTagEntry)
+
 	}
 
 	fmt.Println("Post(s) created")

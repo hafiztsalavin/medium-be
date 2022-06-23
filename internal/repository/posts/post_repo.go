@@ -157,10 +157,10 @@ func (pr *postRepository) AllPostPublish(filter entity.PostsFilter) ([]entity.Po
 	return post, nil
 }
 
-func (pr *postRepository) ReadPostByUserId(idUser int) ([]entity.Posts, error) {
-	var post []entity.Posts
+func (pr *postRepository) ReadPostByPostId(idPost int) (entity.Posts, error) {
+	var post entity.Posts
 
-	if err := pr.db.Preload("Tags").Where("user_id = ? AND status = ?", idUser, statusPublish).Find(&post).Error; err != nil {
+	if err := pr.db.Preload("Tags").Where("id = ? AND status = ?", idPost, statusPublish).Find(&post).Error; err != nil {
 		return post, err
 	}
 
