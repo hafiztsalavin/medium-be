@@ -15,6 +15,7 @@ This for schema db.
 - [x] Docker
 - [ ] Documentation API.
 - [ ] Unit testing.
+- [ ] Redis?
 
 ## Application Dependency
 
