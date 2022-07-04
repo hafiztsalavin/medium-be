@@ -1,8 +1,8 @@
-package posts
+package post
 
 import "medium-be/internal/entity"
 
-type PostInterface interface {
+type PostService interface {
 	CreatePost(newPost entity.Posts, tags []int) error
 	EditPost(idPost int, editPost entity.Posts, tags []int) error
 	ReadPost(idPost int) (entity.Posts, error)

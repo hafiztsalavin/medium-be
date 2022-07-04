@@ -1,8 +1,8 @@
-package tags
+package tag
 
 import "medium-be/internal/entity"
 
-type TagInterface interface {
+type TagService interface {
 	CreateTag(newTag entity.Tag) error
 	DeleteTag(tagId int) error
 	GetTagId(tagId int) (entity.Tag, error)

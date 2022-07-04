@@ -12,6 +12,7 @@ type Config struct {
 	Port           uint16 `env:"PORT,default=8888"`
 	Env            string `env:"ENV"`
 	DatabaseConfig DatabaseOption
+	RedisConfig    RedisOption
 }
 
 type DatabaseOption struct {
@@ -20,6 +21,12 @@ type DatabaseOption struct {
 	Host     string `env:"DB_HOST,default=localhost"`
 	Port     string `env:"DB_PORT,default=5432"`
 	Name     string `env:"DB_NAME,required"`
+}
+
+type RedisOption struct {
+	Addr     string `env:"REDIS_ADDR,required"`
+	Password string `env:"REDIS_PASSWORD"`
+	DB       int    `env:"REDIS_DB,default=0"`
 }
 
 func NewConfig() *Config {

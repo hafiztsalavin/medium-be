@@ -1,8 +1,9 @@
 package tags
 
 import (
+	// "internal/service/postgres/tag"
 	"medium-be/internal/entity"
-	"medium-be/internal/repository/tags"
+	service "medium-be/internal/service/postgres/tag"
 	"medium-be/internal/utils"
 	"net/http"
 	"strconv"
@@ -11,12 +12,12 @@ import (
 )
 
 type TagController struct {
-	Repository tags.TagInterface
+	Service service.TagService
 }
 
 // init
-func NewTagsController(tagsInterface tags.TagInterface) *TagController {
-	return &TagController{Repository: tagsInterface}
+func NewTagsController(tagsService service.TagService) *TagController {
+	return &TagController{Service: tagsService}
 }
 
 func (tc *TagController) CreateTag(c echo.Context) error {
@@ -31,7 +32,8 @@ func (tc *TagController) CreateTag(c echo.Context) error {
 		Name: tagRequest.Name,
 	}
 
-	err := tc.Repository.CreateTag(tag)
+	err := tc.Service.CreateTag(tag)
+
 	if err != nil {
 		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
@@ -45,7 +47,7 @@ func (tc *TagController) DeleteTag(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
 
-	err = tc.Repository.DeleteTag(id)
+	err = tc.Service.DeleteTag(id)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
@@ -59,7 +61,7 @@ func (tc *TagController) ReadTag(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	existedTag, err := tc.Repository.GetTagId(id)
+	existedTag, err := tc.Service.GetTagId(id)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
@@ -75,7 +77,7 @@ func (tc *TagController) ReadTag(c echo.Context) error {
 func (tc *TagController) ReadAllTag(c echo.Context) error {
 	responseTag := []TagResponse{}
 
-	allTag, err := tc.Repository.GetAllTag()
+	allTag, err := tc.Service.GetAllTag()
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
@@ -106,7 +108,7 @@ func (tc *TagController) UpdateTag(c echo.Context) error {
 		Name: tagRequest.Name,
 	}
 
-	err = tc.Repository.EditTag(id, tag)
+	err = tc.Service.EditTag(id, tag)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.ErrorResponse(404, err.Error()))
 	}

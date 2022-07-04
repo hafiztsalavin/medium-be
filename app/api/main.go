@@ -3,15 +3,19 @@ package main
 import (
 	"fmt"
 	"medium-be/internal/config"
-	"medium-be/internal/repository"
+	"medium-be/internal/constants"
+
+	"medium-be/internal/database/postgres"
+	"medium-be/internal/database/redis"
+
 	"medium-be/internal/routes"
 	"medium-be/internal/utils"
 
-	pc "medium-be/internal/controller/posts"
-	pr "medium-be/internal/repository/posts"
-
 	tc "medium-be/internal/controller/tags"
-	tr "medium-be/internal/repository/tags"
+	_tagRepo "medium-be/internal/repository/postgres/tags"
+
+	pc "medium-be/internal/controller/posts"
+	_postRepo "medium-be/internal/repository/postgres/posts"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -23,20 +27,25 @@ func main() {
 	cfg := config.NewConfig()
 
 	// Setup Postgres
-	db, err := repository.NewPostgresRepo(&cfg.DatabaseConfig)
+	db, err := postgres.NewPostgresRepo(&cfg.DatabaseConfig)
 	checkErr(err)
+
+	// Initialize redis
+	constants.Rdb = redis.NewRedisClientFromConfig(&cfg.RedisConfig)
 
 	e := echo.New()
 
 	e.Validator = &utils.Validator{Validator: validator.New()}
-	// Setup Repository
-	newsRepo := pr.NewPostRepository(db)
-	newsController := pc.NewPostController(newsRepo)
 
-	tagRepo := tr.NewTagRepository(db)
+	// Setup Repository
+	postRepo := _postRepo.NewPostRepository(db)
+	postController := pc.NewPostController(postRepo)
+
+	tagRepo := _tagRepo.NewTagRepository(db)
 	tagController := tc.NewTagsController(tagRepo)
 
-	routes.NewsPath(e, newsController)
+	// tagService :=
+	routes.NewsPath(e, postController)
 	routes.TagPath(e, tagController)
 
 	address := fmt.Sprintf(":%d", cfg.Port)

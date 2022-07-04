@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"medium-be/internal/config"
+	repository "medium-be/internal/database/postgres"
 	"medium-be/internal/entity"
-	"medium-be/internal/repository"
 
 	"gorm.io/gorm"
 )

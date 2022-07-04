@@ -2,7 +2,7 @@ package posts
 
 import (
 	"medium-be/internal/entity"
-	"medium-be/internal/repository/posts"
+	service "medium-be/internal/service/postgres/post"
 	"medium-be/internal/utils"
 	"net/http"
 	"strconv"
@@ -12,12 +12,12 @@ import (
 )
 
 type PostController struct {
-	Repository posts.PostInterface
+	Service service.PostService
 }
 
 // init
-func NewPostController(postInterface posts.PostInterface) *PostController {
-	return &PostController{Repository: postInterface}
+func NewPostController(postService service.PostService) *PostController {
+	return &PostController{Service: postService}
 }
 
 func (pc PostController) CreatePost(c echo.Context) error {
@@ -33,10 +33,11 @@ func (pc PostController) CreatePost(c echo.Context) error {
 	newPost := entity.Posts{
 		UserID: idUser,
 		Title:  postRequest.Title,
+		Status: postRequest.Status,
 		Body:   postRequest.Body,
 	}
 
-	err := pc.Repository.CreatePost(newPost, postRequest.Tags)
+	err := pc.Service.CreatePost(newPost, postRequest.Tags)
 	if err != nil {
 		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
@@ -63,7 +64,7 @@ func (pc PostController) UpdatePost(c echo.Context) error {
 		Body:   postRequest.Body,
 	}
 
-	err = pc.Repository.EditPost(idPost, editPost, postRequest.Tags)
+	err = pc.Service.EditPost(idPost, editPost, postRequest.Tags)
 	if err != nil {
 		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
@@ -93,7 +94,7 @@ func (pc PostController) ReadPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	postDB, err := pc.Repository.ReadPost(idPost)
+	postDB, err := pc.Service.ReadPost(idPost)
 	if err != nil || postDB.UserID != idUser {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
@@ -118,7 +119,7 @@ func (pc PostController) ReadAllPost(c echo.Context) error {
 	idUser := c.Get("id").(uint)
 	statusPost := c.QueryParam("status")
 
-	postDB, err := pc.Repository.ReadAllPost(int(idUser), statusPost)
+	postDB, err := pc.Service.ReadAllPost(int(idUser), statusPost)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
@@ -151,7 +152,7 @@ func (pc PostController) PublishPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	err = pc.Repository.PublishPost(idPost, int(idUser))
+	err = pc.Service.PublishPost(idPost, int(idUser))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
@@ -166,7 +167,7 @@ func (pc PostController) DeletePost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	err = pc.Repository.DeletePost(idPost, int(idUser))
+	err = pc.Service.DeletePost(idPost, int(idUser))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
@@ -187,7 +188,7 @@ func (pc PostController) AllPostPublish(c echo.Context) error {
 		Tags:     strings.Split(tags, ","),
 	}
 
-	postDB, err := pc.Repository.AllPostPublish(postFilter)
+	postDB, err := pc.Service.AllPostPublish(postFilter)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
@@ -221,7 +222,7 @@ func (pc PostController) PostByIDPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	postDB, err := pc.Repository.ReadPostByPostId(idPost)
+	postDB, err := pc.Service.ReadPostByPostId(idPost)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
