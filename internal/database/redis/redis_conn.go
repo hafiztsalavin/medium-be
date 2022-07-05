@@ -3,7 +3,7 @@ package redis
 import (
 	"medium-be/internal/config"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 func NewRedisClientFromConfig(cfg *config.RedisOption) *redis.Client {

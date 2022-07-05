@@ -1,7 +1,9 @@
 package posts
 
 import (
+	"encoding/json"
 	"medium-be/internal/entity"
+	redisRepo "medium-be/internal/repository/redis"
 	service "medium-be/internal/service/postgres/post"
 	"medium-be/internal/utils"
 	"net/http"
@@ -10,6 +12,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 )
+
+var postEntity string = "post"
 
 type PostController struct {
 	Service service.PostService
@@ -42,6 +46,8 @@ func (pc PostController) CreatePost(c echo.Context) error {
 		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
 
+	go redisRepo.DeleteCache(postEntity)
+
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
 
@@ -69,21 +75,9 @@ func (pc PostController) UpdatePost(c echo.Context) error {
 		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
 
+	go redisRepo.DeleteCache(postEntity)
+
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
-}
-
-func (pc PostController) UserDetails(c echo.Context) error {
-	idUser := c.Get("id").(uint)
-	emailUser := c.Get("email").(string)
-	roleUser := c.Get("role").(string)
-
-	response := UserResponse{
-		ID:    idUser,
-		Email: emailUser,
-		Role:  roleUser,
-	}
-
-	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }
 
 func (pc PostController) ReadPost(c echo.Context) error {
@@ -112,6 +106,7 @@ func (pc PostController) ReadPost(c echo.Context) error {
 		Status: postDB.Status,
 		Tags:   tags,
 	}
+
 	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }
 
@@ -157,6 +152,8 @@ func (pc PostController) PublishPost(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
 
+	go redisRepo.DeleteCache(postEntity)
+
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
 
@@ -171,6 +168,8 @@ func (pc PostController) DeletePost(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
+
+	go redisRepo.DeleteCache(postEntity)
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
@@ -222,6 +221,14 @@ func (pc PostController) PostByIDPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
+	response := PostResponse{}
+
+	postCache, err := redisRepo.GetCache(postEntity, idPost, "")
+	if err == nil {
+		_ = json.Unmarshal([]byte(postCache), &response)
+		return c.JSON(http.StatusOK, utils.SuccessResponse(response))
+	}
+
 	postDB, err := pc.Service.ReadPostByPostId(idPost)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
@@ -232,7 +239,6 @@ func (pc PostController) PostByIDPost(c echo.Context) error {
 		tags = append(tags, tag.Name)
 	}
 
-	response := PostResponse{}
 	response = PostResponse{
 		ID:     int(postDB.ID),
 		Title:  postDB.Title,
@@ -240,6 +246,9 @@ func (pc PostController) PostByIDPost(c echo.Context) error {
 		Status: postDB.Status,
 		Tags:   tags,
 	}
+
+	resMarshal, _ := json.Marshal(response)
+	go redisRepo.CreateCache(postEntity, idPost, "", resMarshal)
 
 	return c.JSON(http.StatusOK, utils.SuccessResponse(response))
 }

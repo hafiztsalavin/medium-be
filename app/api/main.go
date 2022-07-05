@@ -6,7 +6,7 @@ import (
 	"medium-be/internal/constants"
 
 	"medium-be/internal/database/postgres"
-	"medium-be/internal/database/redis"
+	_redisConn "medium-be/internal/database/redis"
 
 	"medium-be/internal/routes"
 	"medium-be/internal/utils"
@@ -31,7 +31,7 @@ func main() {
 	checkErr(err)
 
 	// Initialize redis
-	constants.Rdb = redis.NewRedisClientFromConfig(&cfg.RedisConfig)
+	constants.Rdb = _redisConn.NewRedisClientFromConfig(&cfg.RedisConfig)
 
 	e := echo.New()
 
