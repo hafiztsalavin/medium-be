@@ -8,20 +8,20 @@ import (
 	dbPostgres "medium-be/internal/database/postgres"
 	dbRedis "medium-be/internal/database/redis"
 
-	_postRepo "medium-be/internal/repository/postgres/posts"
 	_redisRepo "medium-be/internal/repository/redis"
 
 	"medium-be/internal/routes"
-	// "medium-be/internal/utils"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 
 	_postController "medium-be/internal/controller/posts"
+	_postRepo "medium-be/internal/repository/postgres/posts"
 	_postService "medium-be/internal/service/postgres/post"
 
-	"github.com/labstack/echo/v4"
-	// tc "medium-be/internal/controller/tags"
-	// _tagRepo "medium-be/internal/repository/postgres/tags"
-	"github.com/go-playground/validator/v10"
-	// "github.com/labstack/echo/v4"
+	_tagController "medium-be/internal/controller/tags"
+	_tagRepo "medium-be/internal/repository/postgres/tags"
+	_tagService "medium-be/internal/service/postgres/tag"
 )
 
 func main() {
@@ -39,27 +39,23 @@ func main() {
 
 	// Setup repository
 	postRepo := _postRepo.NewPostRepository(db)
+	tagRepo := _tagRepo.NewTagRepository(db)
+
 	cacheRepo := _redisRepo.NewRedisRepository(dbR)
 
 	// Setup service
 	servicePost := _postService.NewPostService(postRepo, cacheRepo)
+	serviceTag := _tagService.NewTagService(tagRepo, cacheRepo)
 
 	// Setup controller
 	postController := _postController.NewPostController(servicePost)
-
+	tagController := _tagController.NewTagsController(serviceTag)
 	e := echo.New()
 
 	e.Validator = &utils.Validator{Validator: validator.New()}
 
-	// // Setup Repository
-	// postController := pc.NewPostController(postRepo)
-
-	// tagRepo := _tagRepo.NewTagRepository(db)
-	// tagController := tc.NewTagsController(tagRepo)
-
-	// // tagService :=
 	routes.PostPath(e, postController)
-	// routes.TagPath(e, tagController)
+	routes.TagPath(e, tagController)
 
 	address := fmt.Sprintf(":%d", cfg.Port)
 	e.Logger.Fatal(e.Start(address))
