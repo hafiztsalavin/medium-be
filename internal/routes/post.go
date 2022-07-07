@@ -9,7 +9,10 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewsPath(e *echo.Echo, postController *posts.PostController) {
+type PostRouter struct {
+}
+
+func PostPath(e *echo.Echo, postController *posts.PostController) {
 	// e.GET("/auth/me", news.ReadOne, middleware.CheckAccess)
 	e.GET("/posts", postController.AllPostPublish)
 	e.GET("/posts/:id", postController.PostByIDPost)

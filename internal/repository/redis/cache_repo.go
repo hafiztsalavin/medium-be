@@ -1,17 +1,31 @@
 package redis
 
 import (
-	"context"
 	"fmt"
-	"medium-be/internal/constants"
+
+	"github.com/go-redis/redis"
 )
 
-var ctx = context.Background()
+type RedisRepository interface {
+	CreateCache(entity string, id int, filter interface{}, data interface{}) error
+	GetCache(entity string, id int, filter interface{}) (string, error)
+	DeleteCache(entity string) error
+}
 
-func CreateCache(entity string, id int, filter interface{}, data interface{}) error {
+type redisRepository struct {
+	client *redis.Client
+}
+
+func NewRedisRepository(client *redis.Client) RedisRepository {
+	return &redisRepository{
+		client: client,
+	}
+}
+
+func (r *redisRepository) CreateCache(entity string, id int, filter interface{}, data interface{}) error {
 	key := entity + ":" + fmt.Sprint(id) + ":" + fmt.Sprint(filter)
 
-	err := constants.Rdb.Set(ctx, key, data, 0).Err()
+	err := r.client.Set(key, data, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -19,10 +33,10 @@ func CreateCache(entity string, id int, filter interface{}, data interface{}) er
 	return nil
 }
 
-func GetCache(entity string, id int, filter interface{}) (string, error) {
+func (r *redisRepository) GetCache(entity string, id int, filter interface{}) (string, error) {
 	key := entity + ":" + fmt.Sprint(id) + ":" + fmt.Sprint(filter)
 
-	data, err := constants.Rdb.Get(ctx, key).Result()
+	data, err := r.client.Get(key).Result()
 	if err != nil {
 		return data, err
 	}
@@ -30,11 +44,11 @@ func GetCache(entity string, id int, filter interface{}) (string, error) {
 	return data, nil
 }
 
-func DeleteCache(entity string) error {
-	iter := constants.Rdb.Scan(ctx, 0, entity+"*", 0).Iterator()
+func (r *redisRepository) DeleteCache(entity string) error {
+	iter := r.client.Scan(0, entity+"*", 0).Iterator()
 
-	for iter.Next(ctx) {
-		if err := constants.Rdb.Del(ctx, iter.Val()).Err(); err != nil {
+	for iter.Next() {
+		if err := r.client.Del(iter.Val()).Err(); err != nil {
 			return err
 		}
 	}

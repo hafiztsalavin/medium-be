@@ -1,9 +1,7 @@
 package tags
 
 import (
-	"encoding/json"
 	"medium-be/internal/entity"
-	redisRepo "medium-be/internal/repository/redis"
 	service "medium-be/internal/service/postgres/tag"
 	"medium-be/internal/utils"
 	"net/http"
@@ -12,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var tagEntity string = "tag"
+// var tagEntity string = "tag"
 
 type TagController struct {
 	Service service.TagService
@@ -41,7 +39,7 @@ func (tc *TagController) CreateTag(c echo.Context) error {
 		return c.JSON(http.StatusConflict, utils.ErrorResponse(409, err.Error()))
 	}
 
-	go redisRepo.DeleteCache(tagEntity)
+	// go redisRepo.DeleteCache(tagEntity)
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
@@ -57,7 +55,7 @@ func (tc *TagController) DeleteTag(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
 
-	go redisRepo.DeleteCache(tagEntity)
+	// go redisRepo.DeleteCache(tagEntity)
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
@@ -84,11 +82,11 @@ func (tc *TagController) ReadTag(c echo.Context) error {
 func (tc *TagController) ReadAllTag(c echo.Context) error {
 	responseTag := []TagResponse{}
 
-	tagCache, err := redisRepo.GetCache(tagEntity, 0, "")
-	if err == nil {
-		_ = json.Unmarshal([]byte(tagCache), &responseTag)
-		return c.JSON(http.StatusOK, utils.SuccessResponse(responseTag))
-	}
+	// tagCache, err := redisRepo.GetCache(tagEntity, 0, "")
+	// if err == nil {
+	// 	_ = json.Unmarshal([]byte(tagCache), &responseTag)
+	// 	return c.JSON(http.StatusOK, utils.SuccessResponse(responseTag))
+	// }
 
 	allTag, err := tc.Service.GetAllTag()
 	if err != nil {
@@ -102,8 +100,8 @@ func (tc *TagController) ReadAllTag(c echo.Context) error {
 		})
 	}
 
-	resMarshal, _ := json.Marshal(responseTag)
-	go redisRepo.CreateCache(tagEntity, 0, "", resMarshal)
+	// resMarshal, _ := json.Marshal(responseTag)
+	// go redisRepo.CreateCache(tagEntity, 0, "", resMarshal)
 
 	return c.JSON(http.StatusOK, utils.SuccessResponse(responseTag))
 }
@@ -129,7 +127,7 @@ func (tc *TagController) UpdateTag(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.ErrorResponse(404, err.Error()))
 	}
 
-	go redisRepo.DeleteCache(tagEntity)
+	// go redisRepo.DeleteCache(tagEntity)
 
 	return c.JSON(http.StatusOK, utils.NewSuccessOperationResponse())
 }
