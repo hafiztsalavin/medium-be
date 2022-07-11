@@ -19,7 +19,7 @@ func NewTagsController(tagsService service.TagService) *TagController {
 }
 
 func (tc *TagController) CreateTag(c echo.Context) error {
-	var tagRequest TagRequest
+	var tagRequest entity.TagRequest
 
 	c.Bind(&tagRequest)
 	if err := c.Validate(&tagRequest); err != nil {
@@ -64,7 +64,7 @@ func (tc *TagController) ReadTag(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
 
-	response := TagResponse{
+	response := entity.TagResponse{
 		ID:  existedTag.ID,
 		Tag: existedTag.Name,
 	}
@@ -79,9 +79,9 @@ func (tc *TagController) ReadAllTag(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
 
-	responseTag := []TagResponse{}
+	responseTag := []entity.TagResponse{}
 	for _, tag := range allTag {
-		responseTag = append(responseTag, TagResponse{
+		responseTag = append(responseTag, entity.TagResponse{
 			ID:  tag.ID,
 			Tag: tag.Name,
 		})
@@ -96,7 +96,7 @@ func (tc *TagController) UpdateTag(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.ErrorResponse(404, err.Error()))
 	}
 
-	var tagRequest TagRequest
+	var tagRequest entity.TagRequest
 	c.Bind(&tagRequest)
 	if err := c.Validate(&tagRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())

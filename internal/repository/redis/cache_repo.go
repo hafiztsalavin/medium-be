@@ -1,14 +1,14 @@
 package redis
 
 import (
-	"fmt"
+	"time"
 
 	"github.com/go-redis/redis"
 )
 
 type RedisRepository interface {
-	CreateCache(entity string, id int, filter interface{}, data interface{}) error
-	GetCache(entity string, id int, filter interface{}) (string, error)
+	CreateCache(key string, tag interface{}, second time.Duration) error
+	GetCache(key string) (string, error)
 	DeleteCache(entity string) error
 }
 
@@ -22,10 +22,9 @@ func NewRedisRepository(client *redis.Client) RedisRepository {
 	}
 }
 
-func (r *redisRepository) CreateCache(entity string, id int, filter interface{}, data interface{}) error {
-	key := entity + ":" + fmt.Sprint(id) + ":" + fmt.Sprint(filter)
+func (r *redisRepository) CreateCache(key string, tag interface{}, second time.Duration) error {
 
-	err := r.client.Set(key, data, 0).Err()
+	err := r.client.Set(key, tag, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -33,8 +32,7 @@ func (r *redisRepository) CreateCache(entity string, id int, filter interface{},
 	return nil
 }
 
-func (r *redisRepository) GetCache(entity string, id int, filter interface{}) (string, error) {
-	key := entity + ":" + fmt.Sprint(id) + ":" + fmt.Sprint(filter)
+func (r *redisRepository) GetCache(key string) (string, error) {
 
 	data, err := r.client.Get(key).Result()
 	if err != nil {
