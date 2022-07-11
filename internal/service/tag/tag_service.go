@@ -17,14 +17,14 @@ type TagService interface {
 }
 
 type tagService struct {
-	tagService _tagRepo.TagRepository
-	redisRepo  _redisRepo.RedisRepository
+	tagRepo   _tagRepo.TagRepository
+	redisRepo _redisRepo.RedisRepository
 }
 
 func NewTagService(tagRepo _tagRepo.TagRepository, redisRepo _redisRepo.RedisRepository) TagService {
 	return &tagService{
-		tagService: tagRepo,
-		redisRepo:  redisRepo,
+		tagRepo:   tagRepo,
+		redisRepo: redisRepo,
 	}
 }
 
@@ -33,7 +33,7 @@ const (
 )
 
 func (ts *tagService) CreateTag(newTag entity.Tag) error {
-	err := ts.tagService.CreateTag(newTag)
+	err := ts.tagRepo.CreateTag(newTag)
 
 	return err
 }
@@ -42,7 +42,7 @@ func (ts *tagService) DeleteTag(tagId int) error {
 	key := ts.keyPrefix(tagId)
 
 	ts.redisRepo.DeleteCache(key)
-	err := ts.tagService.DeleteTag(tagId)
+	err := ts.tagRepo.DeleteTag(tagId)
 
 	return err
 }
@@ -56,7 +56,7 @@ func (ts *tagService) GetTagId(tagId int) (entity.Tag, error) {
 		return tag, nil
 	}
 
-	tag, err := ts.tagService.GetTagId(tagId)
+	tag, err := ts.tagRepo.GetTagId(tagId)
 	if err != nil {
 		return tag, err
 	}
@@ -68,12 +68,12 @@ func (ts *tagService) GetTagId(tagId int) (entity.Tag, error) {
 }
 
 func (ts *tagService) GetAllTag() ([]entity.Tag, error) {
-	tags, err := ts.tagService.GetAllTag()
+	tags, err := ts.tagRepo.GetAllTag()
 	return tags, err
 }
 
 func (ts *tagService) EditTag(tagId int, newTag entity.Tag) error {
-	err := ts.tagService.EditTag(tagId, newTag)
+	err := ts.tagRepo.EditTag(tagId, newTag)
 
 	key := ts.keyPrefix(tagId)
 	ts.redisRepo.DeleteCache(key)
