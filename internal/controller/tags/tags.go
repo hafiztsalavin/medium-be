@@ -2,7 +2,7 @@ package tags
 
 import (
 	"medium-be/internal/entity"
-	service "medium-be/internal/service/postgres/tag"
+	service "medium-be/internal/service/tag"
 	"medium-be/internal/utils"
 	"net/http"
 	"strconv"

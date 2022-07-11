@@ -17,11 +17,11 @@ import (
 
 	_postController "medium-be/internal/controller/posts"
 	_postRepo "medium-be/internal/repository/postgres/posts"
-	_postService "medium-be/internal/service/postgres/post"
+	_postService "medium-be/internal/service/post"
 
 	_tagController "medium-be/internal/controller/tags"
 	_tagRepo "medium-be/internal/repository/postgres/tags"
-	_tagService "medium-be/internal/service/postgres/tag"
+	_tagService "medium-be/internal/service/tag"
 )
 
 func main() {

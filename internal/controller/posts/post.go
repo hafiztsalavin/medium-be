@@ -2,7 +2,7 @@ package posts
 
 import (
 	"medium-be/internal/entity"
-	service "medium-be/internal/service/postgres/post"
+	service "medium-be/internal/service/post"
 	"medium-be/internal/utils"
 	"net/http"
 	"strconv"
