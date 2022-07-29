@@ -50,6 +50,7 @@ func main() {
 	// Setup controller
 	postController := _postController.NewPostController(servicePost)
 	tagController := _tagController.NewTagsController(serviceTag)
+
 	e := echo.New()
 
 	e.Validator = &utils.Validator{Validator: validator.New()}

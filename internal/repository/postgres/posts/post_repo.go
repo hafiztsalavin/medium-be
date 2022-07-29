@@ -26,7 +26,9 @@ func NewPostRepository(db *gorm.DB) *postRepository {
 	return &postRepository{db: db}
 }
 
-const statusPublish = "publish"
+const (
+	statusPublish = "publish"
+)
 
 func (pr *postRepository) CreatePost(newPost entity.Posts, tags []int) error {
 	existedPost, _ := pr.postGetByTitle(newPost.Title)
@@ -157,14 +159,15 @@ func (pr *postRepository) AllPostPublish(filter entity.PostsFilter) ([]entity.Po
 	offset := filter.PageSize * (filter.PageNum - 1)
 
 	if filter.UserID != 0 && filter.Tags[0] != "" {
-		pr.db.Preload("Tags", "name IN (?)", filter.Tags).Where("status = ? AND user_id = ? ", statusPublish, filter.UserID).Offset(offset).Limit(filter.PageSize).Find(&post)
+		pr.db.Preload("Tags").Joins("INNER JOIN post_tags on posts.id = post_tags.posts_id").Joins("INNER JOIN tags on post_tags.tag_id = tags.id AND tags.name IN (?)", filter.Tags).Where("status = ? AND user_id = ? ", statusPublish, filter.UserID).Offset(offset).Limit(filter.PageSize).Find(&post)
 	} else if filter.Tags[0] != "" {
-		pr.db.Preload("Tags", "name IN (?)", filter.Tags).Where("status = ?", statusPublish).Offset(offset).Limit(filter.PageSize).Find(&post)
+		pr.db.Preload("Tags").Joins("INNER JOIN post_tags on posts.id = post_tags.posts_id").Joins("INNER JOIN tags on post_tags.tag_id = tags.id AND tags.name IN (?)", filter.Tags).Where("status = ?", statusPublish).Offset(offset).Limit(filter.PageSize).Find(&post)
 	} else if filter.UserID != 0 {
 		pr.db.Preload("Tags").Where("status = ? AND user_id = ? ", statusPublish, filter.UserID).Offset(offset).Limit(filter.PageSize).Find(&post)
 	} else {
 		pr.db.Preload("Tags").Where("status = ?", statusPublish).Offset(offset).Limit(filter.PageSize).Find(&post)
 	}
+
 	return post, nil
 }
 

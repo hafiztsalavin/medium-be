@@ -40,9 +40,8 @@ func (ts *tagService) CreateTag(newTag entity.Tag) error {
 
 func (ts *tagService) DeleteTag(tagId int) error {
 	key := ts.keyPrefix(tagId)
-
-	ts.redisRepo.DeleteCache(key)
 	err := ts.tagRepo.DeleteTag(tagId)
+	ts.redisRepo.DeleteCache(key)
 
 	return err
 }
@@ -74,7 +73,6 @@ func (ts *tagService) GetAllTag() ([]entity.Tag, error) {
 
 func (ts *tagService) EditTag(tagId int, newTag entity.Tag) error {
 	err := ts.tagRepo.EditTag(tagId, newTag)
-
 	key := ts.keyPrefix(tagId)
 	ts.redisRepo.DeleteCache(key)
 

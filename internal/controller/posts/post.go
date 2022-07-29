@@ -79,7 +79,7 @@ func (pc PostController) ReadPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequestResponse())
 	}
 
-	postDB, err := pc.Service.ReadPost(idPost)
+	postDB, err := pc.Service.ReadPost(idPost, int(idUser))
 	if err != nil || postDB.UserID != idUser {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
@@ -173,15 +173,15 @@ func (pc PostController) AllPostPublish(c echo.Context) error {
 		UserID:   userID,
 		Tags:     strings.Split(tags, ","),
 	}
+	response := []PostResponse{}
 
 	postDB, err := pc.Service.AllPostPublish(postFilter)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewNotFoundResponse())
 	}
 
-	response := []PostResponse{}
 	for _, post := range postDB {
-		if len(post.Tags) > 0 {
+		if len(post.Tags) >= 0 {
 
 			tags := []string{}
 			for _, tag := range post.Tags {
