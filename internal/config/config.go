@@ -21,6 +21,7 @@ type DatabaseOption struct {
 	Host     string `env:"DB_HOST,default=localhost"`
 	Port     string `env:"DB_PORT,default=5432"`
 	Name     string `env:"DB_NAME,required"`
+	Timeout  int    `env:"DB_TIMEOUT,required"`
 }
 
 type RedisOption struct {

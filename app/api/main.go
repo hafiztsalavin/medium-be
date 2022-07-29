@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"medium-be/internal/config"
+	"medium-be/internal/middlewares"
 	"medium-be/internal/utils"
+	"time"
 
 	dbPostgres "medium-be/internal/database/postgres"
 	dbRedis "medium-be/internal/database/redis"
@@ -29,6 +31,8 @@ func main() {
 	// Setup Configuration
 	cfg := config.NewConfig()
 
+	timeoutContext := time.Duration(cfg.DatabaseConfig.Timeout) * time.Second
+
 	// Setup Postgres & redis
 	db, err := dbPostgres.NewPostgresRepo(&cfg.DatabaseConfig)
 	checkErr(err)
@@ -45,7 +49,7 @@ func main() {
 
 	// Setup service
 	servicePost := _postService.NewPostService(postRepo, cacheRepo)
-	serviceTag := _tagService.NewTagService(tagRepo, cacheRepo)
+	serviceTag := _tagService.NewTagService(tagRepo, cacheRepo, timeoutContext)
 
 	// Setup controller
 	postController := _postController.NewPostController(servicePost)
@@ -54,6 +58,8 @@ func main() {
 	e := echo.New()
 
 	e.Validator = &utils.Validator{Validator: validator.New()}
+
+	middlewares.SetLogger(e)
 
 	routes.PostPath(e, postController)
 	routes.TagPath(e, tagController)

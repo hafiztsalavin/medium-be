@@ -95,7 +95,6 @@ func (ps *postService) AllPostPublish(filter entity.PostsFilter) ([]entity.Posts
 
 	postCached, _ := ps.redisRepo.GetCache(key)
 	if err := json.Unmarshal([]byte(postCached), &posts); err == nil {
-		fmt.Println("dari sini")
 		return posts, nil
 	}
 	posts, err := ps.postRepo.AllPostPublish(filter)
